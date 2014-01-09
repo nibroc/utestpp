@@ -1,41 +1,69 @@
+#include <iostream>
 #include <stdexcept>
 #include <string>
 
 namespace utestpp {
-
-	class test_failed : public std::runtime_error 
-	{
-	public:
-		explicit test_failed(const char* what_arg) : std::runtime_error(what_arg)
-		{ }
-		
-		explicit test_failed(std::string what) : std::runtime_error(what)
-		{ }
-	};
 	
-	inline void test_assert(bool cond, const std::string& expr, const std::string& file, 
+	static int NUM_TESTS;
+	static int NUM_FAIL;
+	static int NUM_PASS;
+	
+	inline void init()
+	{ }
+	
+	inline bool test_assert(bool cond, const std::string& expr, const std::string& file, 
 							const std::string& func, int line)
 	{
-		if (!cond) {
-			throw test_failed("FAIL: " + func + " in " + file + 
-							  " (" + std::to_string(line) + ") " +
-							  " cond was false: " + expr);
-
+		++NUM_TESTS;
+		if (cond) {
+			++NUM_PASS;
+		} else {
+			std::cerr << "FAIL: " << func << " in " << file
+					  << " (" << std::to_string(line) << ") "
+					  << " cond was false: " << expr << std::endl;
+			++NUM_FAIL;
 		}
+		return cond;
 	}
 
-	inline void test_throws_exception(bool threw, const std::string& expr, const std::string& exception_type, 
+	inline bool test_throws_exception(bool threw, const std::string& expr, const std::string& exception_type, 
 									  const std::string& file, const std::string& func, int line)
 	{
-		if (!threw) {
-			throw test_failed("FAIL: " + func + " in " + file + 
-							  " (" + std::to_string(line) + ") " +
-							  " did not throw " + exception_type + 
-							  ". (" + expr + ")");
+		++NUM_TESTS;
+		if (threw) {
+			++NUM_PASS;
+			std::cout << "PASS: " << func << " in " << file
+					  << " (" << std::to_string(line) << ") "
+					  << " threw [" << exception_type
+					  << "]. Expression: " << expr << "." 
+					  << std::endl;
+		} else {
+			++NUM_FAIL;
+			std::cerr << "FAIL: " << func << " in " << file
+					  << " (" << std::to_string(line) << ") "
+					  << " did not throw " << exception_type
+					  << ". (" + expr + ")" 
+					  << std::endl;
 		}
+		return threw;
+	}
+	
+	inline void finish()
+	{
+		if (NUM_FAIL > 0) {
+			std::cout << "FAILURE -- ";
+		} else {
+			std::cout << "SUCCESS -- ";
+		}
+		std::cout << "Of " << NUM_TESTS << " tests, " 
+				  << NUM_PASS << " passed and " 
+				  << NUM_FAIL << " failed." << std::endl;
 	}
 
 }
+
+#define UTESTPP_INIT() utestpp::init();
+#define UTESTPP_FINISH() utestpp::finish();
 
 #define ASSERT_TRUE(cond) utestpp::test_assert(cond, #cond, __FILE__, __func__, __LINE__)
 #define ASSERT_EQUAL(x, y) ASSERT_TRUE(x == y)
