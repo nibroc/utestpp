@@ -1,24 +1,43 @@
+#include <stdexcept>
+#include <string>
+
 namespace utestpp {
 
-inline void test_assert(bool cond, const std::string& msg, const std::string& file, const std::string& func, int line)
-{
-	if (!cond) {
-		if (msg.empty()) {
-			throw std::runtime_error("Failed test in "
-									+ file + " in " + func 
-									+ " on line " + std::to_string(line));
-		} else {
-			throw std::runtime_error("Failed test: " + msg + ". " 
-									+ file + " in " + func 
-									+ " on line " + std::to_string(line));
+	class test_failed : public std::runtime_error 
+	{
+	public:
+		explicit test_failed(const char* what_arg) : std::runtime_error(what_arg)
+		{ }
+		
+		explicit test_failed(std::string what) : std::runtime_error(what)
+		{ }
+	};
+	
+	inline void test_assert(bool cond, const std::string& msg, const std::string& file, const std::string& func, int line)
+	{
+		if (!cond) {
+			if (msg.empty()) {
+				throw test_failed("Failed test in "
+										+ file + " in " + func 
+										+ " on line " + std::to_string(line));
+			} else {
+				throw test_failed("Failed test: " + msg + ". " 
+										+ file + " in " + func 
+										+ " on line " + std::to_string(line));
+			}
 		}
 	}
-}
 
-inline void throw_fail(const std::string& msg, const std::string& file, const std::string& func, int line)
-{
-	test_assert(false, msg, file, func, line);
-}
+	inline void test_throws_exception(bool threw, const char* expr, const char* exception_type, 
+									  const char* file, const char* func, int line)
+	{
+		if (!threw) {
+			throw test_failed(std::string("FAILED: ") + func + " in " + file + 
+									 " (" + std::to_string(line) + ") " +
+									 " did not throw " + exception_type + 
+									 ". (" + expr + ")");
+		}
+	}
 
 }
 
@@ -28,16 +47,15 @@ inline void throw_fail(const std::string& msg, const std::string& file, const st
 #define ASSERT_TRUE(cond) ASSERT_TRUE_MSG(cond, "")
 #define ASSERT_EQUAL(x, y) ASSERT_EQUAL_MSG(x, y, "")
 
-#define ASSERT_THROWS_HELPER(expr, msg, file, func, line) \
+#define ASSERT_THROWS_EXCEPTION_HELPER(expr, type) \
 	do {\
 		bool threw = false;\
 		try {\
 			expr;\
-		} catch (...) { threw = true; }\
-		utestpp::test_assert(threw, msg, file, func, line);\
+		} catch (type) { threw = true; }\
+		utestpp::test_throws_exception(threw, #expr, #type, __FILE__, __func__, __LINE__);\
 	} while (0)
-#define ASSERT_THROWS_MSG(expr, msg) ASSERT_THROWS_HELPER(expr, msg, __FILE__, __func__, __LINE__)
-#define ASSERT_THROWS(expr) ASSERT_THROWS_MSG(expr, "")
 
+#define ASSERT_THROWS_EXCEPTION(expr, type) ASSERT_THROWS_EXCEPTION_HELPER(expr, type)
 
-
+#define ASSERT_THROWS(expr) ASSERT_THROWS_EXCEPTION_HELPER(expr, ...)
