@@ -13,18 +13,13 @@ namespace utestpp {
 		{ }
 	};
 	
-	inline void test_assert(bool cond, const std::string& msg, const std::string& file, const std::string& func, int line)
+	inline void test_assert(bool cond, const std::string& file, const std::string& func, int line)
 	{
 		if (!cond) {
-			if (msg.empty()) {
-				throw test_failed("Failed test in "
-										+ file + " in " + func 
-										+ " on line " + std::to_string(line));
-			} else {
-				throw test_failed("Failed test: " + msg + ". " 
-										+ file + " in " + func 
-										+ " on line " + std::to_string(line));
-			}
+			throw test_failed("Failed test in "
+									+ file + " in " + func 
+									+ " on line " + std::to_string(line));
+
 		}
 	}
 
@@ -41,11 +36,8 @@ namespace utestpp {
 
 }
 
-#define ASSERT_TRUE_MSG(cond, msg) utestpp::test_assert(cond, msg, __FILE__, __func__, __LINE__)
-#define ASSERT_EQUAL_MSG(x, y, msg) ASSERT_TRUE_MSG(x == y, msg)
-
-#define ASSERT_TRUE(cond) ASSERT_TRUE_MSG(cond, "")
-#define ASSERT_EQUAL(x, y) ASSERT_EQUAL_MSG(x, y, "")
+#define ASSERT_TRUE(cond) utestpp::test_assert(cond, __FILE__, __func__, __LINE__)
+#define ASSERT_EQUAL(x, y) ASSERT_TRUE(x == y)
 
 #define ASSERT_THROWS_EXCEPTION_HELPER(expr, type) \
 	do {\
