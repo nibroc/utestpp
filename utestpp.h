@@ -65,10 +65,10 @@ namespace utestpp {
 #define UTESTPP_INIT() utestpp::init();
 #define UTESTPP_FINISH() utestpp::finish();
 
-#define ASSERT_TRUE(cond) utestpp::test_assert(cond, #cond, __FILE__, __func__, __LINE__)
-#define ASSERT_EQUAL(x, y) ASSERT_TRUE(x == y)
+#define UTESTPP_ASSERT_TRUE(cond) utestpp::test_assert(cond, #cond, __FILE__, __func__, __LINE__)
+#define UTESTPP_ASSERT_EQUAL(x, y) UTESTPP_ASSERT_TRUE(x == y)
 
-#define ASSERT_THROWS_EXCEPTION_HELPER(expr, type) \
+#define UTESTPP_ASSERT_THROWS_EXCEPTION_HELPER(expr, type) \
 	do {\
 		bool threw = false;\
 		try {\
@@ -77,6 +77,6 @@ namespace utestpp {
 		utestpp::test_throws_exception(threw, #expr, #type, __FILE__, __func__, __LINE__);\
 	} while (0)
 
-#define ASSERT_THROWS_EXCEPTION(expr, type) ASSERT_THROWS_EXCEPTION_HELPER(expr, type)
+#define UTESTPP_ASSERT_THROWS_EXCEPTION(expr, type) UTESTPP_ASSERT_THROWS_EXCEPTION_HELPER(expr, type)
 
-#define ASSERT_THROWS(expr) ASSERT_THROWS_EXCEPTION_HELPER(expr, ...)
+#define UTESTPP_ASSERT_THROWS(expr) UTESTPP_ASSERT_THROWS_EXCEPTION_HELPER(expr, ...)
