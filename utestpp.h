@@ -16,10 +16,13 @@ namespace utestpp {
 	{
 		++NUM_TESTS;
 		if (cond) {
+			std::cout << "PASS: " << func << " in " << file
+					  << " (" << std::to_string(line) << ")"
+					  << " cond was true: " << expr << std::endl;
 			++NUM_PASS;
 		} else {
 			std::cerr << "FAIL: " << func << " in " << file
-					  << " (" << std::to_string(line) << ") "
+					  << " (" << std::to_string(line) << ")"
 					  << " cond was false: " << expr << std::endl;
 			++NUM_FAIL;
 		}
@@ -33,14 +36,14 @@ namespace utestpp {
 		if (threw) {
 			++NUM_PASS;
 			std::cout << "PASS: " << func << " in " << file
-					  << " (" << std::to_string(line) << ") "
+					  << " (" << std::to_string(line) << ")"
 					  << " threw [" << exception_type
 					  << "]. Expression: " << expr << "." 
 					  << std::endl;
 		} else {
 			++NUM_FAIL;
 			std::cerr << "FAIL: " << func << " in " << file
-					  << " (" << std::to_string(line) << ") "
+					  << " (" << std::to_string(line) << ")"
 					  << " did not throw " << exception_type
 					  << ". (" + expr + ")" 
 					  << std::endl;
@@ -48,7 +51,7 @@ namespace utestpp {
 		return threw;
 	}
 	
-	inline void finish()
+	inline int finish()
 	{
 		if (NUM_FAIL > 0) {
 			std::cout << "FAILURE -- ";
@@ -58,6 +61,7 @@ namespace utestpp {
 		std::cout << "Of " << NUM_TESTS << " tests, " 
 				  << NUM_PASS << " passed and " 
 				  << NUM_FAIL << " failed." << std::endl;
+		return (NUM_FAIL == 0);
 	}
 
 }
@@ -80,3 +84,7 @@ namespace utestpp {
 #define UTESTPP_ASSERT_THROWS_EXCEPTION(expr, type) UTESTPP_ASSERT_THROWS_EXCEPTION_HELPER(expr, type)
 
 #define UTESTPP_ASSERT_THROWS(expr) UTESTPP_ASSERT_THROWS_EXCEPTION_HELPER(expr, ...)
+
+#ifdef UTESTPP_SHORT_NAMES
+#error "Short names are not yet implemented"
+#endif

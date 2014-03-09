@@ -3,6 +3,13 @@ utestpp
 
 utest++ is a small, simple, procedural unit testing suite with a focus on of use and simple tests. It is not very sophisticated or powerful compared to more featureful testing frameworks, but it has no installation (just one header), and it is very easy with which to get started.
 
+Requirements
+=======
+
+utestpp requires C++11 or more recent.
+
+With a few minor tweaks (getting rid of `std::to_string`), it could easily be modified to use C++03.
+
 Usage
 =======
 
@@ -45,8 +52,13 @@ Example
 		
 		UTESTPP_ASSERT_THROWS(v.at(5));
 		
-		UTESTPP_ASSERT_THROWS(v.at(5), std::out_of_range);
+		UTESTPP_ASSERT_THROWS_EXCEPTION(v.at(5), std::out_of_range);
 		
 		return UTESTPP_FINISH();
 	}
+
+Short Names
+=======
+
+If you don't care about maintaining the `UTESTPP_` psuedo-namespace on the macros, you can define `UTESTPP_SHORT_NAMES` before including `utestpp.h`. In addition to the prefixed names, this defines equivalent macros without the `UTESTPP_` prefix (e.g. `ASSERT_EQUAL`). Note that `UTESTPP_INIT` and `UTESTPP_FINISH` will still have the `UTESTPP_` prefix.
 
